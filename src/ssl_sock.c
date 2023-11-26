@@ -5345,6 +5345,9 @@ int ssl_sock_prepare_bind_conf(struct bind_conf *bind_conf)
         }
 #endif
 		}
+#ifdef USE_ECH
+        }
+#endif
 	}
 
 	/* check that we didn't use "strict-sni" and "default-crt" together */
