@@ -734,7 +734,6 @@ not_ssl_hello:
 }
 
 #ifdef USE_ECH
-
 static int
 payload_attempt_split_ech(const struct arg *args,
                           struct sample *smp,
@@ -903,9 +902,8 @@ smp_fetch_ssl_hello_sni(const struct arg *args, struct sample *smp, const char *
      * 1st ECH decryption since the inner CH will flag
      * that it is an inner CH.)
      * side note: those multiple calls confused me a lot;-)
-     * TODO: consider a malformed inner CH that contains
-     * another layer of ECH decryption or doesn't have the
-     * is-inner flag in the CH extension.
+     * TODO: consider a malformed inner CH, e.g., doesn't
+     * have the is-inner flag in the CH extension.
      */
     if (smp->px && smp->px->tcp_req.ech_ctx && smp->ctx.a[0] == NULL
         && payload_attempt_split_ech(args, smp, kw, private) == 1) {
