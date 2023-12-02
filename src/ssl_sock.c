@@ -5069,10 +5069,10 @@ int ssl_sock_prepare_bind_conf(struct bind_conf *bind_conf)
 			ha_alert("Proxy '%s': no SSL certificate specified for bind '%s' at [%s:%d] (use 'crt').\n",
 				 px->id, bind_conf->arg, bind_conf->file, bind_conf->line);
 			return -1;
-		}
 #ifdef USE_ECH
         }
 #endif
+		}
 	}
 
 	/* check that we didn't use "strict-sni" and "default-crt" together */
