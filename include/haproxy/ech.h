@@ -6,6 +6,9 @@
 #include <openssl/ech.h>
 #include <haproxy/ech-t.h>
 
+/* define this for additional logging of split-mode ECH */
+#define ECHDOLOG
+
 int load_echkeys(SSL_CTX *ctx, char *dirname, int *loaded);
 int conn_get_ech_status(struct connection *conn, struct buffer *buf);
 int conn_get_ech_outer_sni(struct connection *conn, struct buffer *buf);
