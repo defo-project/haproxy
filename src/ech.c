@@ -470,7 +470,6 @@ static struct bind_kw_list bind_kws = { "SSL", { }, {
 
 
 
-
 static int innerouter_cmp(ech_state_t *ech_state, char *io, int isinner)
 {
     char *svar = NULL;
@@ -571,6 +570,11 @@ int attempt_split_ech(ech_state_t *ech_state,
     if (isccs) {
         memcpy(*newdata, orig, 6);
     }
+    /*
+     * We'll clear OpenSSL errors here (for now).
+     * TODO: check if this is ok, it seems wrong;-(
+     */
+    ERR_clear_error();
     /* Attempt to decrypt and retrieve inner/outer SNI values */
     srv = SSL_CTX_ech_raw_decrypt(ech_state->ctx, dec_ok,
                                   &newinner, &newouter,
