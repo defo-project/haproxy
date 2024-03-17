@@ -1,0 +1,42 @@
+--- haproxy-2.9.9.orig/Makefile
++++ haproxy-2.9.9/Makefile
+@@ -169,6 +169,7 @@
+ #### Toolchain options.
+ CC = cc
+ LD = $(CC)
++PKG_CONFIG ?= pkg-config
+ 
+ #### Default optimizations
+ # Those are integrated early in the list of CFLAGS, and may be overridden by
+--- haproxy-2.9.9.orig/addons/ot/Makefile
++++ haproxy-2.9.9/addons/ot/Makefile
+@@ -18,8 +18,8 @@
+ endif
+ 
+ ifeq ($(OT_INC),)
+-OT_PKGSTAT = $(shell pkg-config --exists $(OTC_WRAPPER)$(OT_DEBUG_EXT); echo $$?)
+-OT_CFLAGS = $(shell pkg-config --silence-errors --cflags $(OTC_WRAPPER)$(OT_DEBUG_EXT))
++OT_PKGSTAT = $(shell $(PKG_CONFIG) --exists $(OTC_WRAPPER)$(OT_DEBUG_EXT); echo $$?)
++OT_CFLAGS = $(shell $(PKG_CONFIG) --silence-errors --cflags $(OTC_WRAPPER)$(OT_DEBUG_EXT))
+ else
+ ifneq ($(wildcard $(OT_INC)/$(OTC_WRAPPER)/.*),)
+ OT_CFLAGS = -I$(OT_INC) $(if $(OT_DEBUG),-DOTC_DBG_MEM)
+@@ -37,7 +37,7 @@
+ endif
+ 
+ ifeq ($(OT_LIB),)
+-OT_LDFLAGS = $(shell pkg-config --silence-errors --libs $(OTC_WRAPPER)$(OT_DEBUG_EXT))
++OT_LDFLAGS = $(shell $(PKG_CONFIG) --silence-errors --libs $(OTC_WRAPPER)$(OT_DEBUG_EXT))
+ else
+ ifneq ($(wildcard $(OT_LIB)/lib$(OTC_WRAPPER).*),)
+ OT_LDFLAGS = -L$(OT_LIB) -l$(OTC_WRAPPER)$(OT_DEBUG_EXT)
+--- haproxy-2.9.9.orig/admin/wireshark-dissectors/peers/Makefile
++++ haproxy-2.9.9/admin/wireshark-dissectors/peers/Makefile
+@@ -1,5 +1,5 @@
+-CFLAGS  = `pkg-config --cflags wireshark` -g -fPIC $(OPTS)
+-LDFLAGS = `pkg-config --libs wireshark`
++CFLAGS  = `$(PKG_CONFIG) --cflags wireshark` -g -fPIC $(OPTS)
++LDFLAGS = `$(PKG_CONFIG) --libs wireshark`
+ 
+ NAME = packet-happp.so
+ OBJS = packet-happp.o
