@@ -1,0 +1,38 @@
+Format: 1.8
+Date: Tue, 23 Jan 2024 11:48:59 +0100
+Source: haproxy
+Binary: haproxy haproxy-dbgsym haproxy-doc vim-haproxy
+Architecture: amd64 all
+Version: 3.1.dev2.16.g1cc200738-20240701.053902087218584
+Distribution: testing
+Urgency: medium
+Maintainer: Debian HAProxy Maintainers <team+haproxy@tracker.debian.org>
+Changed-By: Jochen Sprickerhof <jspricke@debian.org>
+Description:
+ haproxy    - fast and reliable load balancing reverse proxy
+ haproxy-doc - fast and reliable load balancing reverse proxy (HTML documentatio
+ vim-haproxy - syntax highlighting for HAProxy configuration files
+Changes:
+ haproxy (3.1.dev2.16.g1cc200738-20240701.053902087218584) UNRELEASED; urgency=medium
+ .
+   ** SNAPSHOT build @33c3aede4 **
+ .
+   * Add ECH patch
+Checksums-Sha1:
+ 2e09574cf571c4ca3fe8262ecad7c54cf4779d6f 6473684 haproxy-dbgsym_3.1.dev2.16.g1cc200738-20240701.053902087218584_amd64.deb
+ 359a0f2aea35ec4d96b445f765791912067c4937 982968 haproxy-doc_3.1.dev2.16.g1cc200738-20240701.053902087218584_all.deb
+ 68f17c39fe76cfa39f30f9f7b5fc044dcf6b758d 8168 haproxy_3.1.dev2.16.g1cc200738-20240701.053902087218584_amd64.buildinfo
+ e835d5dedd1017df42141e539c64ff92e4ef4ebc 2536864 haproxy_3.1.dev2.16.g1cc200738-20240701.053902087218584_amd64.deb
+ c01e3b79b90b83a1cd2d8ba751eb339858b02744 449428 vim-haproxy_3.1.dev2.16.g1cc200738-20240701.053902087218584_all.deb
+Checksums-Sha256:
+ 3b6d38e81cd0b4f2afbaaa64ff8904fba9725596aa4dbdcf80d4bf73a04c3238 6473684 haproxy-dbgsym_3.1.dev2.16.g1cc200738-20240701.053902087218584_amd64.deb
+ 907ff7c8b1e8c4eb30ce632721f2fd879c82c26c8e4dce853fa75c5ba0bf42d0 982968 haproxy-doc_3.1.dev2.16.g1cc200738-20240701.053902087218584_all.deb
+ 2369b4da8c83303d73e0032eaf024175ce5b705ff302424920bc123f9f93b4b5 8168 haproxy_3.1.dev2.16.g1cc200738-20240701.053902087218584_amd64.buildinfo
+ ae2a99c7b7324d201a769cd53e4e190c51d8fc901d6f46734617bfeb234abd18 2536864 haproxy_3.1.dev2.16.g1cc200738-20240701.053902087218584_amd64.deb
+ c4dbf1cbbf2eb6a4bdd531fc2470d91454141e27fdbd16abf1accf56e2ac24ff 449428 vim-haproxy_3.1.dev2.16.g1cc200738-20240701.053902087218584_all.deb
+Files:
+ 80ac4daebe161fd6138697133d052522 6473684 debug optional haproxy-dbgsym_3.1.dev2.16.g1cc200738-20240701.053902087218584_amd64.deb
+ 528f4957dae7cff7bccf02a49b1d8037 982968 doc optional haproxy-doc_3.1.dev2.16.g1cc200738-20240701.053902087218584_all.deb
+ d8e284816d237f259690c15d2d6bccf9 8168 net optional haproxy_3.1.dev2.16.g1cc200738-20240701.053902087218584_amd64.buildinfo
+ 451aabc3f3b4fec69864fd7d5652fa60 2536864 net optional haproxy_3.1.dev2.16.g1cc200738-20240701.053902087218584_amd64.deb
+ 4175349e8293c26d54775a83c929b090 449428 net optional vim-haproxy_3.1.dev2.16.g1cc200738-20240701.053902087218584_all.deb
