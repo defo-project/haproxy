@@ -1,0 +1,94 @@
+Package: haproxy-dbgsym
+Architecture: amd64
+Version: 3.1.dev14.26.g7c4d035dd-20241125.064644411769329
+Auto-Built-Package: debug-symbols
+Priority: optional
+Section: debug
+Source: haproxy
+Maintainer: Debian HAProxy Maintainers <team+haproxy@tracker.debian.org>
+Installed-Size: 7344
+Depends: haproxy (= 3.1.dev14.26.g7c4d035dd-20241125.064644411769329)
+Breaks: haproxy-dbg
+Replaces: haproxy-dbg
+Filename: ./haproxy-dbgsym_3.1.dev14.26.g7c4d035dd-20241125.064644411769329_amd64.deb
+Size: 7113772
+MD5sum: fd347fd5aada6ed260b1404a8a7cbc61
+SHA1: d7bcaf2bcc5ac823c3df783711b667845710e979
+SHA256: af593120fdec453ecb5a3a079c1441e87e8c8a276812b28ef47a6822139dd08b
+SHA512: 32ed118ec7389b8ec1ed151f39427d815f0f2b2c088565761ccd1e5b5ea001911e33e2ac13ee4be4706a242fde62e34b621fa1faa307230662c009a2bef7eff9
+Description: debug symbols for haproxy
+Build-Ids: 72d7b1fc3dc2d192db953c5790b333e5e6a4e17c e25e48782f1fd900e90c7a16d38ee7cbb253114f
+
+Package: haproxy-doc
+Architecture: all
+Version: 3.1.dev14.26.g7c4d035dd-20241125.064644411769329
+Priority: optional
+Section: doc
+Source: haproxy
+Maintainer: Debian HAProxy Maintainers <team+haproxy@tracker.debian.org>
+Installed-Size: 4827
+Pre-Depends: dpkg (>= 1.17.14)
+Depends: libjs-bootstrap (<< 4), libjs-jquery, libjs-sphinxdoc (>= 7.4)
+Filename: ./haproxy-doc_3.1.dev14.26.g7c4d035dd-20241125.064644411769329_all.deb
+Size: 1015616
+MD5sum: d6d16e839367f480a2bd50689e6461a2
+SHA1: 6a1a7dcfe88921601c6ea8f16d5befc37c4f4828
+SHA256: 390d6c870c56a9bbd0762a684e2f9506f3db9afefa5c6724179b3263b2ea10ba
+SHA512: 24a1d44f8703ee480c8917bb3e600e3313fd6c47092f406802724a5aa6cdc41e5eadce786a0c39db268ee75677e318819818e7bda05de3a188fee2f547795260
+Homepage: http://www.haproxy.org/
+Description: fast and reliable load balancing reverse proxy (HTML documentation)
+ HAProxy is a TCP/HTTP reverse proxy which is particularly suited for high
+ availability environments. It features connection persistence through HTTP
+ cookies, load balancing, header addition, modification, deletion both ways. It
+ has request blocking capabilities and provides interface to display server
+ status.
+ .
+ This package contains the HTML documentation for haproxy.
+
+Package: haproxy
+Architecture: amd64
+Version: 3.1.dev14.26.g7c4d035dd-20241125.064644411769329
+Priority: optional
+Section: net
+Maintainer: Debian HAProxy Maintainers <team+haproxy@tracker.debian.org>
+Installed-Size: 6033
+Pre-Depends: dpkg (>= 1.17.14), init-system-helpers (>= 1.54~)
+Depends: libc6 (>= 2.38), libcrypt1 (>= 1:4.1.0), libjemalloc2 (>= 2.1.1), liblua5.3-0, libopentracing-c-wrapper0t64 (>= 1.1.0), libpcre2-8-0 (>= 10.22), libssl3t64 (>= 3.4.0.alpha1.931.ge6521665c0), adduser, lsb-base (>= 3.0-6)
+Suggests: vim-haproxy, haproxy-doc
+Filename: ./haproxy_3.1.dev14.26.g7c4d035dd-20241125.064644411769329_amd64.deb
+Size: 2693776
+MD5sum: 1aef7f45f96ec9b6ce8127806a37f75e
+SHA1: 72182b100514772da33e6fb9eccda4508e2669ac
+SHA256: f0c69b5c1adc11115528b5a21d623c7ea61ea4b29181fb9ffe0fd02c313fda50
+SHA512: fab599c16440262463a5563f47bb0e8d1adb7beb21b2333cc7cb00ba0ead8ba2421d2c0f3139ec4170a6993dbd3879913c707713dd4066c6d1ba0ab11c6c9f49
+Homepage: http://www.haproxy.org/
+Description: fast and reliable load balancing reverse proxy
+ HAProxy is a TCP/HTTP reverse proxy which is particularly suited for high
+ availability environments. It features connection persistence through HTTP
+ cookies, load balancing, header addition, modification, deletion both ways. It
+ has request blocking capabilities and provides interface to display server
+ status.
+
+Package: vim-haproxy
+Architecture: all
+Version: 3.1.dev14.26.g7c4d035dd-20241125.064644411769329
+Priority: optional
+Section: net
+Source: haproxy
+Maintainer: Debian HAProxy Maintainers <team+haproxy@tracker.debian.org>
+Installed-Size: 502
+Recommends: vim-addon-manager
+Filename: ./vim-haproxy_3.1.dev14.26.g7c4d035dd-20241125.064644411769329_all.deb
+Size: 468044
+MD5sum: 7df119fb115a1191389e8a0a1a365026
+SHA1: 9425a682f9ec207b88095b25a9e4a554d9ff942c
+SHA256: ec274708bdd4e679744f2de9b43e20d03b318057d3ca7ebc8a664a77746c2d17
+SHA512: a62fcaf2705984366d408030a37dd08a4a527a2c366d257aad1dee565c6c878d2e5397c511e10c55a00f2d02bd4e5322f45a04571ee25ff83535269bb396fd6c
+Homepage: http://www.haproxy.org/
+Description: syntax highlighting for HAProxy configuration files
+ The vim-haproxy package provides filetype detection and syntax highlighting
+ for HAProxy configuration files.
+ .
+ As per the Debian vim policy, installed addons are not activated
+ automatically, but the "vim-addon-manager" tool can be used for this purpose.
+
