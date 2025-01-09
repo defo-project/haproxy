@@ -469,7 +469,6 @@ static struct bind_kw_list bind_kws = { "SSL", { }, {
 }};
 
 
-
 static int innerouter_cmp(ech_state_t *ech_state, char *io, int isinner)
 {
     char *svar = NULL;

@@ -8182,9 +8182,8 @@ static int cli_parse_show_ech(char **args, char *payload, struct appctx *appctx,
 
 static void cli_print_ech_info(SSL_CTX *ctx, struct buffer *trash)
 {
-    OSSL_ECH_INFO *info = NULL;
-    SSL *s = NULL;
-    int count = 0;
+    int oi_ind, oi_cnt = 0;
+    OSSL_ECHSTORE *es = NULL;
     BIO *out = NULL;
 
     out = BIO_new(BIO_s_mem());
@@ -8192,39 +8191,44 @@ static void cli_print_ech_info(SSL_CTX *ctx, struct buffer *trash)
         chunk_appendf(trash, "error making BIO\n");
         return;
     }
-    s = SSL_new(ctx);
-    if (!s) {
-        chunk_appendf(trash, "error making SSL\n");
-        return;
-    }
-    if (!SSL_ech_get_info(s, &info, &count)) {
-        chunk_appendf(trash, "error getting ECH Info\n");
+    if ((es = SSL_CTX_get1_echstore(ctx)) == NULL
+        || OSSL_ECHSTORE_num_entries(es, &oi_cnt) != 1) {
+        chunk_appendf(trash, "error accessing ECH store\n");
         goto end;
     }
-    if (count <= 0) {
+    if (oi_cnt <= 0)
         chunk_appendf(trash, "no ECH config\n");
-    } else if (!OSSL_ECH_INFO_print(out, info, count)) {
-        chunk_appendf(trash, "error printing ECH Info\n");
-        goto end;
-    }
-    if (info && count > 0) {
+    for (oi_ind = 0; oi_ind < oi_cnt; oi_ind++) {
+        time_t secs = 0;
+        char *pn = NULL, *ec = NULL;
+        int has_priv, for_retry, returned;
         struct buffer *tmp = alloc_trash_chunk();
-        int returned;
 
         if (!tmp) {
             chunk_appendf(trash, "error making tmp buffer\n");
             goto end;
         }
+        if (OSSL_ECHSTORE_get1_info(es, oi_ind, &secs, &pn, &ec,
+                                    &has_priv, &for_retry) != 1) {
+            chunk_appendf(trash, "error printing ECH Info\n");
+            OPENSSL_free(pn); /* just in case */
+            OPENSSL_free(ec);
+            goto end;
+        }
+        BIO_printf(out, "ECH entry: %d public_name: %s age: %lld%s\n",
+                   oi_ind, pn, (long long)secs,
+                   has_priv ? " (has private key)" : "");
+        BIO_printf(out, "\t%s\n", ec);
+        OPENSSL_free(pn);
+        OPENSSL_free(ec);
         returned = BIO_read(out, tmp->area, tmp->size-1);
         tmp->area[returned] = '\0';
         chunk_appendf(trash, "\n%s", tmp->area);
         free_trash_chunk(tmp);
     }
-
 end:
     BIO_free(out);
-    OSSL_ECH_INFO_free(info, count);
-    SSL_free(s);
+    OSSL_ECHSTORE_free(es);
     return;
 }
 
@@ -8327,15 +8331,23 @@ static int cli_parse_add_ech(char **args, char *payload, struct appctx *appctx,
 {
     SSL_CTX *sctx = NULL;
     char success_message[ECH_SUCCESS_MSG_MAX];
+    OSSL_ECHSTORE *es = NULL;
+    BIO *es_in = NULL;
 
     if (!*args[3] || !payload)
         return cli_err(appctx, "syntax: add ssl ech <name> <PEM file content>");
     if (cli_find_ech_specific_ctx(args[3], &sctx) != 1)
         return cli_err(appctx, "'add ssl ech' unable to locate referenced name\n");
-    if (SSL_CTX_ech_server_enable_buffer(sctx, (unsigned char*)payload,
-                                         strlen(payload),
-                                         SSL_ECH_USE_FOR_RETRY) != 1)
+    if ((es_in = BIO_new_mem_buf(payload, strlen(payload))) == NULL
+        || (es = SSL_CTX_get1_echstore(sctx)) == NULL
+        || OSSL_ECHSTORE_read_pem(es, es_in, OSSL_ECH_FOR_RETRY) != 1
+        || SSL_CTX_set1_echstore(sctx, es) != 1) {
+        OSSL_ECHSTORE_free(es);
+        BIO_free_all(es_in);
         return cli_err(appctx, "'add ssl ech' error adding provided PEM ECH value\n");
+    }
+    OSSL_ECHSTORE_free(es);
+    BIO_free_all(es_in);
     snprintf(success_message, ECH_SUCCESS_MSG_MAX,
              "added a new ECH config to %s", args[3]);
     return cli_msg(appctx, LOG_INFO, success_message);
@@ -8346,17 +8358,23 @@ static int cli_parse_set_ech(char **args, char *payload, struct appctx *appctx, 
 {
     SSL_CTX *sctx = NULL;
     char success_message[ECH_SUCCESS_MSG_MAX];
+    OSSL_ECHSTORE *es = NULL;
+    BIO *es_in = NULL;
 
     if (!*args[3] || !payload)
         return cli_err(appctx, "syntax: set ssl ech <name> <PEM file content>");
     if (cli_find_ech_specific_ctx(args[3], &sctx) != 1)
         return cli_err(appctx, "'set ssl ech' unable to locate referenced name\n");
-    if (SSL_CTX_ech_server_flush_keys(sctx, 0) != 1)
-        return cli_err(appctx, "'set ssl ech' error removing old ECH values\n");
-    if (SSL_CTX_ech_server_enable_buffer(sctx, (unsigned char*)payload,
-                                         strlen(payload),
-                                         SSL_ECH_USE_FOR_RETRY) != 1)
+    if ((es_in = BIO_new_mem_buf(payload, strlen(payload))) == NULL
+        || (es = OSSL_ECHSTORE_new(NULL, NULL)) == NULL
+        || OSSL_ECHSTORE_read_pem(es, es_in, OSSL_ECH_FOR_RETRY) != 1
+        || SSL_CTX_set1_echstore(sctx, es) != 1) {
+        OSSL_ECHSTORE_free(es);
+        BIO_free_all(es_in);
         return cli_err(appctx, "'set ssl ech' error adding provided PEM ECH value\n");
+    }
+    OSSL_ECHSTORE_free(es);
+    BIO_free_all(es_in);
     snprintf(success_message, ECH_SUCCESS_MSG_MAX,
              "set new ECH configs for %s", args[3]);
     return cli_msg(appctx, LOG_INFO, success_message);
@@ -8368,6 +8386,7 @@ static int cli_parse_del_ech(char **args, char *payload, struct appctx *appctx, 
     SSL_CTX *sctx = NULL;
     time_t age = 0;
     char success_message[ECH_SUCCESS_MSG_MAX];
+    OSSL_ECHSTORE *es = NULL;
 
     if (!*args[3])
         return cli_err(appctx, "syntax: del ssl ech <name>");
@@ -8375,12 +8394,17 @@ static int cli_parse_del_ech(char **args, char *payload, struct appctx *appctx, 
         age = atoi(args[4]);
     if (cli_find_ech_specific_ctx(args[3], &sctx) != 1)
         return cli_err(appctx, "'del ssl ech' unable to locate referenced name\n");
-    if (SSL_CTX_ech_server_flush_keys(sctx, age) != 1)
+    if ((es = SSL_CTX_get1_echstore(sctx)) == NULL
+        || OSSL_ECHSTORE_flush_keys(es, age) != 1
+        || SSL_CTX_set1_echstore(sctx, es) != 1) {
+        OSSL_ECHSTORE_free(es);
         return cli_err(appctx, "'del ssl ech' error removing old ECH values\n");
+    }
+    OSSL_ECHSTORE_free(es);
     memset(success_message, 0, ECH_SUCCESS_MSG_MAX);
     if (!age)
         snprintf(success_message, ECH_SUCCESS_MSG_MAX,
-                 "deleted all ECH configs older than from %s", args[3]);
+                 "deleted all ECH configs from %s", args[3]);
     else
         snprintf(success_message, ECH_SUCCESS_MSG_MAX,
                  "deleted ECH configs older than %ld seconds from %s", age, args[3]);

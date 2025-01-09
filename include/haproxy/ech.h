@@ -18,5 +18,7 @@ int attempt_split_ech(ech_state_t *ech_state,
                       unsigned char **newdata, size_t *newlen);
 void ech_state_free(ech_state_t *st);
 
+int load_echkeys(SSL_CTX *ctx, char *dirname, int *loaded);
+
 # endif /* USE_ECH */
 #endif /* _HAPROXY_ECH_H */

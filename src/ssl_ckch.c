@@ -2348,30 +2348,6 @@ yield:
 #endif
 }
 
-#ifdef USE_ECH
-/* parsing function for 'show ssl ech [echfile]' */
-static int cli_parse_show_ech(char **args, char *payload, struct appctx *appctx, void *private)
-{
-	struct buffer *out = alloc_trash_chunk();
-
-	if (!out)
-		goto end_no_putchk;
-
-    /* retrieve and display ECH info */
-    chunk_appendf(out, "ECH stuff... coming soon\n");
-
-	if (applet_putchk(appctx, out) == -1)
-		goto yield;
-
-end_no_putchk:
-	free_trash_chunk(out);
-	return 1;
-yield:
-	free_trash_chunk(out);
-    return 0;
-}
-#endif
-
 /* parsing function for 'show ssl cert [certfile]' */
 static int cli_parse_show_cert(char **args, char *payload, struct appctx *appctx, void *private)
 {
