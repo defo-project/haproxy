@@ -30,6 +30,9 @@
 #include <haproxy/ticks.h>
 #include <haproxy/tools.h>
 #include <haproxy/trace.h>
+#ifdef USE_ECH
+#include <haproxy/ech.h>
+#endif
 
 
 #define TRACE_SOURCE &trace_strm
@@ -1338,8 +1341,7 @@ static int tcp_parse_tcp_req(char **args, int section_type, struct proxy *curpx,
             }
         }
         /* Add ECH keys to SSL_CTX */
-        if (SSL_CTX_ech_server_enable_dir(curpx->tcp_req.ech_ctx, &loaded,
-                                          args[2], SSL_ECH_USE_FOR_RETRY) != 1) {
+        if (load_echkeys(curpx->tcp_req.ech_ctx, args[2], &loaded) != 1) {
             /* Warn that we skipped it */
 			memprintf(err, "loading %s %s %s failed - skipping that one %s '%s'",
 			          args[0], args[1], args[2], proxy_type_str(curpx), curpx->id);
