@@ -1,0 +1,38 @@
+Format: 1.8
+Date: Tue, 23 Jan 2024 11:48:59 +0100
+Source: haproxy
+Binary: haproxy haproxy-dbgsym haproxy-doc vim-haproxy
+Architecture: amd64 all
+Version: 3.2.dev4.75.g3acf517de-20250201.064108927514497
+Distribution: testing
+Urgency: medium
+Maintainer: Debian HAProxy Maintainers <team+haproxy@tracker.debian.org>
+Changed-By: Jochen Sprickerhof <jspricke@debian.org>
+Description:
+ haproxy    - fast and reliable load balancing reverse proxy
+ haproxy-doc - fast and reliable load balancing reverse proxy (HTML documentatio
+ vim-haproxy - syntax highlighting for HAProxy configuration files
+Changes:
+ haproxy (3.2.dev4.75.g3acf517de-20250201.064108927514497) UNRELEASED; urgency=medium
+ .
+   ** SNAPSHOT build @33c3aede4 **
+ .
+   * Add ECH patch
+Checksums-Sha1:
+ 5c08dbfee5b01d31b680290b62137cee6a8c74f3 7166672 haproxy-dbgsym_3.2.dev4.75.g3acf517de-20250201.064108927514497_amd64.deb
+ 864f7964501fa7510dd3bd76f6059917d7c898a5 1027460 haproxy-doc_3.2.dev4.75.g3acf517de-20250201.064108927514497_all.deb
+ 1818fb8824426809e3819af310e24242b70a3f2b 8614 haproxy_3.2.dev4.75.g3acf517de-20250201.064108927514497_amd64.buildinfo
+ a4bafb69aecc55b0bae9f5792124b39c85667cd7 2727524 haproxy_3.2.dev4.75.g3acf517de-20250201.064108927514497_amd64.deb
+ 5226fa597a9c3a1815b16d9a00c327ba3877a064 474036 vim-haproxy_3.2.dev4.75.g3acf517de-20250201.064108927514497_all.deb
+Checksums-Sha256:
+ 3a54f9917d67b06a767c4f6c3df228cf66829f0bef61464b1d239998c7d537c2 7166672 haproxy-dbgsym_3.2.dev4.75.g3acf517de-20250201.064108927514497_amd64.deb
+ e25d85f2b89bfe6494241f6fcd26335864ba92b12734c681c828da46e4e432b9 1027460 haproxy-doc_3.2.dev4.75.g3acf517de-20250201.064108927514497_all.deb
+ d082edb1662e153c9e8a7a93c38a0d1529a303238fc6dd2b38c42a6633f85bc6 8614 haproxy_3.2.dev4.75.g3acf517de-20250201.064108927514497_amd64.buildinfo
+ 5567349942716447495de801029d99d342e26a2dace6a7ed59fe0090b2773031 2727524 haproxy_3.2.dev4.75.g3acf517de-20250201.064108927514497_amd64.deb
+ 8e7183d88c1d29f9c40951b11ffb8e9bd40ffa22588212abd3d6a01754d17006 474036 vim-haproxy_3.2.dev4.75.g3acf517de-20250201.064108927514497_all.deb
+Files:
+ b39463dd434a5b495b733a83cc56ef10 7166672 debug optional haproxy-dbgsym_3.2.dev4.75.g3acf517de-20250201.064108927514497_amd64.deb
+ ebae8442a5302d813b756f6405f6fe0f 1027460 doc optional haproxy-doc_3.2.dev4.75.g3acf517de-20250201.064108927514497_all.deb
+ 88d1c02c1a4111da43b5ef19561f9889 8614 net optional haproxy_3.2.dev4.75.g3acf517de-20250201.064108927514497_amd64.buildinfo
+ a7cc570023f924c7891af45c492460a8 2727524 net optional haproxy_3.2.dev4.75.g3acf517de-20250201.064108927514497_amd64.deb
+ 65b56fde55041b99d014a966b53990f6 474036 net optional vim-haproxy_3.2.dev4.75.g3acf517de-20250201.064108927514497_all.deb
