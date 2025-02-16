@@ -170,7 +170,7 @@ void ech_state_free(ech_state_t *st)
  */
 int load_echkeys(SSL_CTX *ctx, char *dirname, int *loaded)
 {
-    struct dirent **de_list;
+    struct dirent **de_list = NULL;
     struct stat thestat;
     /*
      * I really can't see a reason to want >1024 private key files
