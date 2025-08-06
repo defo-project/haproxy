@@ -1,3 +1,9 @@
+haproxy (3.0.11-1.ech) UNRELEASED; urgency=medium
+
+  * Add ECH patch
+
+ -- Jochen Sprickerhof <jspricke@debian.org>  Wed, 06 Aug 2025 15:25:37 +0200
+
 haproxy (3.0.11-1) unstable; urgency=medium
 
   * New upstream release.
