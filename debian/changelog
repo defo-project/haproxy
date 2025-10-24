@@ -1,8 +1,120 @@
-haproxy (3.0.11-1.ech) UNRELEASED; urgency=medium
+haproxy (3.2.6-1.ech) UNRELEASED; urgency=medium
 
   * Add ECH patch
 
  -- Jochen Sprickerhof <jspricke@debian.org>  Wed, 06 Aug 2025 15:25:37 +0200
+
+haproxy (3.2.6-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Vincent Bernat <bernat@debian.org>  Fri, 03 Oct 2025 17:04:47 +0200
+
+haproxy (3.2.5-2) unstable; urgency=high
+
+  * CVE-2025-11230: fix possible DoS when parsing JSON numbers.
+
+ -- Vincent Bernat <bernat@debian.org>  Thu, 02 Oct 2025 17:06:08 +0200
+
+haproxy (3.2.5-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Upload to unstable.
+  * d/watch: update to version 5.
+
+ -- Vincent Bernat <bernat@debian.org>  Fri, 26 Sep 2025 21:34:05 +0200
+
+haproxy (3.2.4-1) experimental; urgency=medium
+
+  * d/rules: build again without USE_QUIC_OPENSSL_COMPAT and require
+    libssl (>= 3.5.1).
+
+ -- Vincent Bernat <bernat@debian.org>  Thu, 14 Aug 2025 07:07:28 +0200
+
+haproxy (3.2.3-2) experimental; urgency=medium
+
+  * d/rules: build with USE_QUIC_OPENSSL_COMPAT until libssl (>= 3.5.1) is
+    available in Trixie.
+
+ -- Vincent Bernat <bernat@debian.org>  Fri, 11 Jul 2025 21:56:54 +0200
+
+haproxy (3.2.3-1) experimental; urgency=medium
+
+  [ Yaacov Akiba Slama ]
+  * d/rules: do not build with USE_QUIC_OPENSSL_COMPAT.
+  * d/control: Build-Depends on libssl (>= 3.5.0).
+
+  [ Vincent Bernat ]
+  * New upstream release.
+
+ -- Vincent Bernat <bernat@debian.org>  Sun, 15 Jun 2025 10:33:43 +0200
+
+haproxy (3.2.1-1) experimental; urgency=medium
+
+  * New upstream release.
+  * d/control: build-depends on libcrypt-dev. Closes: #1107033.
+
+ -- Vincent Bernat <bernat@debian.org>  Sat, 14 Jun 2025 08:31:04 +0200
+
+haproxy (3.2.0-1) experimental; urgency=medium
+
+  * New upstream release.
+  * d/copyright: update FSF address.
+
+ -- Vincent Bernat <bernat@debian.org>  Thu, 29 May 2025 10:26:20 +0200
+
+haproxy (3.1.7-1) experimental; urgency=medium
+
+  * New upstream release. Fix CVE-2025-32464.
+
+ -- Vincent Bernat <bernat@debian.org>  Sat, 19 Apr 2025 17:41:25 +0200
+
+haproxy (3.1.6-1) experimental; urgency=medium
+
+  * New upstream release.
+  * d/control: drop Pre-Depends on dpkg. Closes: #1100452.
+
+ -- Vincent Bernat <bernat@debian.org>  Sat, 22 Mar 2025 17:01:14 +0100
+
+haproxy (3.1.5-1) experimental; urgency=medium
+
+  * New upstream release.
+
+ -- Vincent Bernat <bernat@debian.org>  Fri, 21 Feb 2025 14:57:21 +0100
+
+haproxy (3.1.3-1) experimental; urgency=medium
+
+  * New upstream release.
+
+ -- Vincent Bernat <bernat@debian.org>  Wed, 29 Jan 2025 21:26:23 +0100
+
+haproxy (3.1.2-1) experimental; urgency=medium
+
+  * New upstream release.
+
+ -- Vincent Bernat <bernat@debian.org>  Sun, 12 Jan 2025 15:55:49 +0100
+
+haproxy (3.1.1-1) experimental; urgency=medium
+
+  * New upstream release.
+
+ -- Vincent Bernat <bernat@debian.org>  Sat, 14 Dec 2024 21:21:15 +0100
+
+haproxy (3.1.0-2) experimental; urgency=medium
+
+  [ Helmut Grohne ]
+  * Fix FTCBFS: (Closes: #1079532)
+    + Require a sphinx for the build architecture.
+    + Pass CC and PKG_CONFIG to all make targets.
+    + cross.patch: Honour the passed ${PKG_CONFIG}.
+
+ -- Vincent Bernat <bernat@debian.org>  Sun, 01 Dec 2024 18:08:58 +0100
+
+haproxy (3.1.0-1) experimental; urgency=medium
+
+  * New upstream release.
+
+ -- Vincent Bernat <bernat@debian.org>  Sat, 30 Nov 2024 23:34:36 +0100
 
 haproxy (3.0.11-1) unstable; urgency=medium
 
@@ -1045,7 +1157,7 @@ haproxy (2.0.8-1) unstable; urgency=medium
 
 haproxy (2.0.7-1) unstable; urgency=medium
 
-  * New upstream release.  
+  * New upstream release.
     - BUG/MAJOR: mux-h2: Handle HEADERS frames received after a RST_STREAM
                  frame
     - BUG/MAJOR: mux_h2: Don't consume more payload than received for
@@ -1866,7 +1978,7 @@ haproxy (1.6.4-1) unstable; urgency=medium
   * New upstream release (see CHANGELOG):
     + BUG/MAJOR: http-reuse: fix risk of orphaned connections.
     + BUG/MAJOR: lua: applets can't sleep.
-    + BUG/MAJOR: samples: check smp->strm before using it. 
+    + BUG/MAJOR: samples: check smp->strm before using it.
     + BUG/MAJOR: servers state: server port is erased when dns resolution is
       enabled on a server.
     + BUG/MAJOR: vars: always retrieve the stream and session from the sample
@@ -2461,7 +2573,7 @@ haproxy (1.5~dev19-2) experimental; urgency=low
   [ Vincent Bernat ]
   * Really enable systemd support by using dh-systemd helper.
   * Don't use -L/usr/lib and rely on default search path. Closes: #722777.
-  
+
   [ Apollon Oikonomopoulos ]
   * Ship halog.
 
@@ -2480,7 +2592,7 @@ haproxy (1.5~dev19-1) experimental; urgency=high
   * Drop bashism patch. It seems useless to maintain a patch to convert
     example scripts from /bin/bash to /bin/sh.
   * Fix reload/restart action of init script (LP: #1187469)
-  
+
  -- Vincent Bernat <bernat@debian.org>  Mon, 17 Jun 2013 22:03:58 +0200
 
 haproxy (1.5~dev18-1) experimental; urgency=low
@@ -2516,7 +2628,7 @@ haproxy (1.4.24-2) unstable; urgency=low
 
   [ Apollon Oikonomopoulos ]
   * Ship contrib/halog as /usr/bin/halog.
-  
+
   [ Vincent Bernat ]
   * Don't use -L/usr/lib and rely on default search path. Closes: #722777.
 
