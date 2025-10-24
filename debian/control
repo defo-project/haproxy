@@ -8,7 +8,7 @@ Uploaders: Apollon Oikonomopoulos <apoikos@debian.org>,
 Standards-Version: 4.4.1
 Build-Depends: debhelper-compat (= 12),
                libpcre2-dev,
-               libssl-dev,
+               libssl-dev (>= 3.5.1),
                libcrypt-dev,
                liblua5.4-dev,
                libsystemd-dev [linux-any],
