@@ -28,6 +28,9 @@
 #include <haproxy/show_flags-t.h>
 #include <haproxy/task-t.h>
 #include <haproxy/xref-t.h>
+#ifdef USE_ECH
+#include <haproxy/ech-t.h>
+#endif
 
 enum iobuf_flags {
 	IOBUF_FL_NONE             = 0x00000000, /* For initialization purposes */
@@ -374,6 +377,9 @@ struct stconn {
 	enum obj_type *app;                  /* points to the applicative point (stream or check) */
 	struct sockaddr_storage *src;        /* source address (pool), when known, otherwise NULL */
 	struct sockaddr_storage *dst;        /* destination address (pool), when known, otherwise NULL */
+#ifdef USE_ECH
+    ech_state_t *ech_state;
+#endif
 };
 
 

@@ -4,6 +4,7 @@
 #ifdef USE_ECH
 
 #include <haproxy/openssl-compat.h>
+#include <haproxy/ech-t.h>
 
 # if defined(OPENSSL_IS_AWSLC)
 #  include <openssl/hpke.h>
@@ -14,6 +15,16 @@
 int load_echkeys(SSL_CTX *ctx, char *dirname, int *loaded, char **err);
 int conn_get_ech_status(struct connection *conn, struct buffer *buf);
 int conn_get_ech_outer_sni(struct connection *conn, struct buffer *buf);
+
+/* define this for additional logging of split-mode ECH */
+#define ECHDOLOG
+
+int attempt_split_ech(ech_state_t *ech_state,
+                      unsigned char *data, size_t bleft,
+                      int *dec_ok,
+                      unsigned char **newdata, size_t *newlen);
+
+void ech_state_free(ech_state_t *st);
 
 # endif /* USE_ECH */
 #endif /* _HAPROXY_ECH_H */
