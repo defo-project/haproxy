@@ -680,6 +680,12 @@ ifneq ($(USE_OPENSSL:0=),)
   endif
 endif
 
+# For our Encrypted Client Hello (ECH) experiment
+ifneq ($(USE_ECH),)
+	SSL_CFLAGS      := -DUSE_ECH
+
+endif
+
 ifneq ($(USE_ENGINE:0=),)
   # OpenSSL 3.0 emits loud deprecation warnings by default when building with
   # engine support, and this option is made to silence them. Better use it
