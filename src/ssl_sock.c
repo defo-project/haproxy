@@ -256,6 +256,20 @@ struct show_keys_ctx {
 	} state;                       /* phase of the current dump */
 };
 
+#ifdef USE_ECH
+struct show_ech_ctx {
+    struct proxy * pp;
+    int fd;
+    SSL_CTX *specific_ctx;
+    char *specific_name;
+    enum {
+        SHOW_ECH_PROXY = 0,
+        SHOW_ECH_FD,
+        SHOW_ECH_SPECIFIC,
+    } state;                       /* phase of the current dump */
+};
+#endif
+
 /* ssl_sock_io_cb is exported to see it resolved in "show fd" */
 struct task *ssl_sock_io_cb(struct task *, void *, unsigned int);
 static int ssl_sock_handshake(struct connection *conn, unsigned int flag);
@@ -7601,6 +7615,38 @@ const char *ssl_sock_get_proto_version(struct connection *conn)
 	return SSL_get_version(ctx->ssl);
 }
 
+#ifdef USE_ECH
+int ssl_sock_get_ech_status(struct connection *conn, char **logstr)
+{
+	struct ssl_sock_ctx *ctx = conn_get_ssl_sock_ctx(conn);
+    char *sni_ech = NULL;
+    char *sni_clr = NULL;
+    const char *str;
+    char *lstr = NULL;
+
+	if (!ctx)
+		return 0;
+#define s(x) #x
+    switch (SSL_ech_get1_status(ctx->ssl, &sni_ech, &sni_clr)) {
+      case SSL_ECH_STATUS_SUCCESS:   str = s(SSL_ECH_STATUS_SUCCESS);   break;
+      case SSL_ECH_STATUS_NOT_TRIED: str = s(SSL_ECH_STATUS_NOT_TRIED); break;
+      case SSL_ECH_STATUS_FAILED:    str = s(SSL_ECH_STATUS_FAILED);    break;
+      case SSL_ECH_STATUS_BAD_NAME:  str = s(SSL_ECH_STATUS_BAD_NAME);  break;
+      case SSL_ECH_STATUS_BAD_CALL:  str = s(SSL_ECH_STATUS_BAD_CALL);  break;
+      case SSL_ECH_STATUS_GREASE:    str = s(SSL_ECH_STATUS_GREASE);    break;
+      case SSL_ECH_STATUS_BACKEND:   str = s(SSL_ECH_STATUS_BACKEND);   break;
+      default:                       str = "ECH status unknown";        break;
+    }
+#undef s
+    if (sni_ech == NULL) sni_ech = "";
+    if (sni_clr == NULL) sni_clr = "";
+    lstr = malloc(1000);
+    snprintf(lstr, 1000, "%s/%s/%s", str, sni_clr, sni_ech);
+    *logstr = lstr;
+    return 1;
+}
+#endif
+
 void ssl_sock_set_alpn(struct connection *conn, const unsigned char *alpn, int len)
 {
 #ifdef TLSEXT_TYPE_application_layer_protocol_negotiation
@@ -8117,6 +8163,376 @@ static int cli_parse_set_tlskeys(char **args, char *payload, struct appctx *appc
 #endif
 
 
+#ifdef USE_ECH
+/*
+ * ECH key management
+ *
+ * "show" syntax: "show ssl ech [name]" where name is a frontend
+ * or backend.
+ *
+ * To use this, start haproxy, then (with out test configs)
+ *
+ *      $ socat /tmp/haproxy.sock stdio
+ *      prompt
+ *      > show ssl ech
+ *      ...
+ *      >
+ *
+ * After running socat, you have to type "prompt" to get the
+ * command line.
+ *
+ * Right now the output (for haproxymin.conf) looks like:
+ *
+ *     $ socat /tmp/haproxy.sock stdio
+ *     prompt
+ *     > show ssl ech
+ *     ***
+ *     backend (split-mode): 3484
+ *     ECH details (3 configs total)
+ *     index: 0: loaded 4 seconds, SNI (inner:NULL;outer:NULL), ALPN (inner:NULL;outer:NULL)
+ *         [fe0d,bb,example.com,0020,[0001,0001],62c7607bf2c5fe1108446f132ca4339cf19df1552e5a42960fd02c697360163c,00,00]
+ *     index: 1: loaded 4 seconds, SNI (inner:NULL;outer:NULL), ALPN (inner:NULL;outer:NULL)
+ *         [fe0d,64,example.com,0020,[0001,0001],cc12c8fb828c202d11b5adad67e15d0cccce1aaa493e1df34a770e4a5cdcd103,00,00]
+ *     index: 2: loaded 4 seconds, SNI (inner:NULL;outer:NULL), ALPN (inner:NULL;outer:NULL)
+ *         [fe0d,bb,example.com,0020,[0001,0001],62c7607bf2c5fe1108446f132ca4339cf19df1552e5a42960fd02c697360163c,00,00]
+ *     ***
+ *     frontend: ECH-front
+ *     ECH details (3 configs total)
+ *     index: 0: loaded 4 seconds, SNI (inner:NULL;outer:NULL), ALPN (inner:NULL;outer:NULL)
+ *         [fe0d,bb,example.com,0020,[0001,0001],62c7607bf2c5fe1108446f132ca4339cf19df1552e5a42960fd02c697360163c,00,00]
+ *     index: 1: loaded 4 seconds, SNI (inner:NULL;outer:NULL), ALPN (inner:NULL;outer:NULL)
+ *         [fe0d,64,example.com,0020,[0001,0001],cc12c8fb828c202d11b5adad67e15d0cccce1aaa493e1df34a770e4a5cdcd103,00,00]
+ *     index: 2: loaded 4 seconds, SNI (inner:NULL;outer:NULL), ALPN (inner:NULL;outer:NULL)
+ *         [fe0d,bb,example.com,0020,[0001,0001],62c7607bf2c5fe1108446f132ca4339cf19df1552e5a42960fd02c697360163c,00,00]
+ *     ***
+ *     frontend: Two-TLS
+ *     ECH details (3 configs total)
+ *     index: 0: loaded 4 seconds, SNI (inner:NULL;outer:NULL), ALPN (inner:NULL;outer:NULL)
+ *         [fe0d,bb,example.com,0020,[0001,0001],62c7607bf2c5fe1108446f132ca4339cf19df1552e5a42960fd02c697360163c,00,00]
+ *     index: 1: loaded 4 seconds, SNI (inner:NULL;outer:NULL), ALPN (inner:NULL;outer:NULL)
+ *         [fe0d,64,example.com,0020,[0001,0001],cc12c8fb828c202d11b5adad67e15d0cccce1aaa493e1df34a770e4a5cdcd103,00,00]
+ *     index: 2: loaded 4 seconds, SNI (inner:NULL;outer:NULL), ALPN (inner:NULL;outer:NULL)
+ *         [fe0d,bb,example.com,0020,[0001,0001],62c7607bf2c5fe1108446f132ca4339cf19df1552e5a42960fd02c697360163c,00,00]
+ *
+ * CRTL-d will exit from the command line.
+ *
+ * You can also do it without the prompt:
+ *
+ *     $ echo "show ssl ech" | socat /tmp/haproxy.sock stdio
+ *     ...
+ *
+ * We find the SSL_CTX pointers differently for frontend and
+ * backend (ECH split-mode), as follows:
+ *
+ * backend: proxies_list[*].tcp_req.ech_ctx named via proxies_list[*].id
+ * frontend: objt_listener(fdtab[*]).bind_conf->initial_ctx, named via
+ * objt_listener(fdtab[*]).bind_conf->frontend->id
+ *
+ * note that not all entries will have ECH configs, nor SSL_CTX values
+ *
+ * If we ever add client-side ECH between haproxy and backends then we'd
+ * also be interested in proxies_list[*].srv->ssl_ctx.ctx but for now
+ * we'll not include those.
+ */
+
+/* find a named SSL_CTX, returns 1 if found */
+static int cli_find_ech_specific_ctx(char *name, SSL_CTX **sctx)
+{
+    struct proxy *pr = NULL;
+    struct fdtab *fdt = NULL;
+    struct listener *li = NULL;
+    int found = 0, fd = 0;
+    SSL_CTX *res = NULL;
+
+    if (!name || !sctx)
+        return 0;
+    /* check in proxies for backend split-mode cases */
+    pr = proxies_list;
+    while (pr && !found) {
+        if (!strcmp(pr->id, name) && pr->tcp_req.ech_ctx) {
+            found = 1;
+            res = pr->tcp_req.ech_ctx;
+        }
+        pr = pr->next;
+    }
+    /* check fd's for frontend cases */
+    while (!found && fd < global.maxsock) {
+        fdt = &fdtab[fd++];
+        if (!fdt->owner)
+            continue;
+        li = objt_listener(fdt->owner);
+        if (li && li->bind_conf && li->bind_conf->initial_ctx
+            && li->bind_conf->frontend
+            && !strcmp(li->bind_conf->frontend->id, name)) {
+            found = 1;
+            res = li->bind_conf->initial_ctx;
+        }
+    }
+    if (found)
+        *sctx = res;
+    return found;
+}
+
+/* parsing function for 'show ssl ech [echfile]' */
+static int cli_parse_show_ech(char **args, char *payload, struct appctx *appctx, void *private)
+{
+    struct show_ech_ctx *ctx = applet_reserve_svcctx(appctx, sizeof(*ctx));
+
+	/* no parameter, shows only file list */
+	if (*args[3]) {
+        SSL_CTX *sctx = NULL;
+
+        if (cli_find_ech_specific_ctx(args[3], &sctx) != 1)
+            return cli_err(appctx, "'show ssl ech' unable to locate referenced name\n");
+        ctx->specific_name = args[3];
+        ctx->specific_ctx = sctx;
+        ctx->state = SHOW_ECH_SPECIFIC;
+        ctx->fd = 0;
+        ctx->pp = NULL;
+    } else {
+        ctx->specific_name = NULL;
+        ctx->specific_ctx = NULL;
+        ctx->pp = proxies_list;
+        ctx->fd = 0;
+        ctx->state = SHOW_ECH_PROXY;
+    }
+
+    return 0;
+}
+
+static void cli_print_ech_info(SSL_CTX *ctx, struct buffer *trash)
+{
+    int oi_ind, oi_cnt = 0;
+    OSSL_ECHSTORE *es = NULL;
+    BIO *out = NULL;
+
+    out = BIO_new(BIO_s_mem());
+    if (!out) {
+        chunk_appendf(trash, "error making BIO\n");
+        return;
+    }
+    if ((es = SSL_CTX_get1_echstore(ctx)) == NULL
+        || OSSL_ECHSTORE_num_entries(es, &oi_cnt) != 1) {
+        chunk_appendf(trash, "error accessing ECH store\n");
+        goto end;
+    }
+    if (oi_cnt <= 0)
+        chunk_appendf(trash, "no ECH config\n");
+    for (oi_ind = 0; oi_ind < oi_cnt; oi_ind++) {
+        time_t secs = 0;
+        char *pn = NULL, *ec = NULL;
+        int has_priv, for_retry, returned;
+        struct buffer *tmp = alloc_trash_chunk();
+
+        if (!tmp) {
+            chunk_appendf(trash, "error making tmp buffer\n");
+            goto end;
+        }
+        if (OSSL_ECHSTORE_get1_info(es, oi_ind, &secs, &pn, &ec,
+                                    &has_priv, &for_retry) != 1) {
+            chunk_appendf(trash, "error printing ECH Info\n");
+            OPENSSL_free(pn); /* just in case */
+            OPENSSL_free(ec);
+            goto end;
+        }
+        BIO_printf(out, "ECH entry: %d public_name: %s age: %lld%s\n",
+                   oi_ind, pn, (long long)secs,
+                   has_priv ? " (has private key)" : "");
+        BIO_printf(out, "\t%s\n", ec);
+        OPENSSL_free(pn);
+        OPENSSL_free(ec);
+        returned = BIO_read(out, tmp->area, tmp->size-1);
+        tmp->area[returned] = '\0';
+        chunk_appendf(trash, "\n%s", tmp->area);
+        free_trash_chunk(tmp);
+    }
+end:
+    BIO_free(out);
+    OSSL_ECHSTORE_free(es);
+    return;
+}
+
+/*
+ * Print out ECH details where they (might) exist
+ *
+ * The applet_putchk() calls will emit text to the "stats" socket
+ * which is more or less a command line UI. If that returns a -1
+ * then we should break off processing to allow other threads to
+ * do stuff (I think). That's why all the "goto end" stuff and
+ * why the code is kind of re-entrant.
+ */
+
+static int cli_io_handler_ech_details(struct appctx *appctx)
+{
+    struct buffer *trash = get_trash_chunk();
+    struct show_ech_ctx *ctx = appctx->svcctx;
+    struct listener *li = NULL;
+    int ret = 0;
+
+    if (!ctx) return 1;
+
+    /* isolate the threads once per round. We're limited to a buffer worth
+     * of output anyway, it cannot last very long.
+     */
+    thread_isolate();
+
+    if (ctx->state == SHOW_ECH_SPECIFIC) {
+        chunk_appendf(trash, "***\nECH for %s ", ctx->specific_name);
+        cli_print_ech_info(ctx->specific_ctx, trash);
+        if (applet_putchk(appctx, trash) == -1)
+            return 0;
+        thread_release();
+        return 1;
+    }
+
+    if (ctx->state == SHOW_ECH_PROXY) {
+        if (!ctx->pp) { /* move to next state */
+            ctx->state = SHOW_ECH_FD;
+            goto end;
+        }
+        while (ctx->pp) {
+            struct proxy *pr = ctx->pp;
+
+            ctx->pp = ctx->pp->next;
+            /* split-mode ECH info */
+            if (pr->tcp_req.ech_ctx) {
+                chunk_appendf(trash, "***\nbackend (split-mode): %s ", pr->id);
+                cli_print_ech_info(pr->tcp_req.ech_ctx, trash);
+                if (applet_putchk(appctx, trash) == -1)
+                    goto end;
+            }
+        }
+        ctx->state = SHOW_ECH_FD;
+    }
+
+    if (ctx->state == SHOW_ECH_FD) {
+        struct fdtab *fdt = NULL;
+
+        /* not sure of right limit */
+        while (ctx->fd < global.maxsock) {
+            fdt = &fdtab[ctx->fd++];
+            if (fdt->owner) {
+                li = objt_listener(fdt->owner);
+                if (li && li->bind_conf && li->bind_conf->initial_ctx) {
+                    /* print stuff */
+                    if (li->bind_conf->frontend)
+                        chunk_appendf(trash, "***\nfrontend: %s ", li->bind_conf->frontend->id);
+                    else
+                        chunk_appendf(trash, "***\nfrontend fd; %d ", ctx->fd-1);
+                    cli_print_ech_info(li->bind_conf->initial_ctx, trash);
+                    if (applet_putchk(appctx, trash) == -1)
+                        goto end;
+                }
+            }
+        }
+        ret = 1; /* we're all done */
+    }
+
+end:
+    thread_release();
+    return ret;
+}
+
+#define ECH_SUCCESS_MSG_MAX 256
+
+/*
+ * For the add and set commands below one needs to provide the ECH PEM file
+ * content on the command line. That can be done via:
+ *
+ *          $ openssl ech -public_name htest.com -pemout htest.pem
+ *          $ echo -e "add ssl ech ECH-front <<EOF\n$(cat htest.pem)\nEOF\n" | socat /tmp/haproxy.sock -
+ *          added a new ECH config to ECH-front
+ *
+ */
+
+/* add ssl ech <name> <pemesni> */
+static int cli_parse_add_ech(char **args, char *payload, struct appctx *appctx,
+                             void *private)
+{
+    SSL_CTX *sctx = NULL;
+    char success_message[ECH_SUCCESS_MSG_MAX];
+    OSSL_ECHSTORE *es = NULL;
+    BIO *es_in = NULL;
+
+    if (!*args[3] || !payload)
+        return cli_err(appctx, "syntax: add ssl ech <name> <PEM file content>");
+    if (cli_find_ech_specific_ctx(args[3], &sctx) != 1)
+        return cli_err(appctx, "'add ssl ech' unable to locate referenced name\n");
+    if ((es_in = BIO_new_mem_buf(payload, strlen(payload))) == NULL
+        || (es = SSL_CTX_get1_echstore(sctx)) == NULL
+        || OSSL_ECHSTORE_read_pem(es, es_in, OSSL_ECH_FOR_RETRY) != 1
+        || SSL_CTX_set1_echstore(sctx, es) != 1) {
+        OSSL_ECHSTORE_free(es);
+        BIO_free_all(es_in);
+        return cli_err(appctx, "'add ssl ech' error adding provided PEM ECH value\n");
+    }
+    OSSL_ECHSTORE_free(es);
+    BIO_free_all(es_in);
+    snprintf(success_message, ECH_SUCCESS_MSG_MAX,
+             "added a new ECH config to %s", args[3]);
+    return cli_msg(appctx, LOG_INFO, success_message);
+}
+
+/* set ssl ech <name> <pemesni> */
+static int cli_parse_set_ech(char **args, char *payload, struct appctx *appctx, void *private)
+{
+    SSL_CTX *sctx = NULL;
+    char success_message[ECH_SUCCESS_MSG_MAX];
+    OSSL_ECHSTORE *es = NULL;
+    BIO *es_in = NULL;
+
+    if (!*args[3] || !payload)
+        return cli_err(appctx, "syntax: set ssl ech <name> <PEM file content>");
+    if (cli_find_ech_specific_ctx(args[3], &sctx) != 1)
+        return cli_err(appctx, "'set ssl ech' unable to locate referenced name\n");
+    if ((es_in = BIO_new_mem_buf(payload, strlen(payload))) == NULL
+        || (es = OSSL_ECHSTORE_new(NULL, NULL)) == NULL
+        || OSSL_ECHSTORE_read_pem(es, es_in, OSSL_ECH_FOR_RETRY) != 1
+        || SSL_CTX_set1_echstore(sctx, es) != 1) {
+        OSSL_ECHSTORE_free(es);
+        BIO_free_all(es_in);
+        return cli_err(appctx, "'set ssl ech' error adding provided PEM ECH value\n");
+    }
+    OSSL_ECHSTORE_free(es);
+    BIO_free_all(es_in);
+    snprintf(success_message, ECH_SUCCESS_MSG_MAX,
+             "set new ECH configs for %s", args[3]);
+    return cli_msg(appctx, LOG_INFO, success_message);
+}
+
+/* del ssl ech <name> [<age-in-secs>] */
+static int cli_parse_del_ech(char **args, char *payload, struct appctx *appctx, void *private)
+{
+    SSL_CTX *sctx = NULL;
+    time_t age = 0;
+    char success_message[ECH_SUCCESS_MSG_MAX];
+    OSSL_ECHSTORE *es = NULL;
+
+    if (!*args[3])
+        return cli_err(appctx, "syntax: del ssl ech <name>");
+    if (*args[4])
+        age = atoi(args[4]);
+    if (cli_find_ech_specific_ctx(args[3], &sctx) != 1)
+        return cli_err(appctx, "'del ssl ech' unable to locate referenced name\n");
+    if ((es = SSL_CTX_get1_echstore(sctx)) == NULL
+        || OSSL_ECHSTORE_flush_keys(es, age) != 1
+        || SSL_CTX_set1_echstore(sctx, es) != 1) {
+        OSSL_ECHSTORE_free(es);
+        return cli_err(appctx, "'del ssl ech' error removing old ECH values\n");
+    }
+    OSSL_ECHSTORE_free(es);
+    memset(success_message, 0, ECH_SUCCESS_MSG_MAX);
+    if (!age)
+        snprintf(success_message, ECH_SUCCESS_MSG_MAX,
+                 "deleted all ECH configs from %s", args[3]);
+    else
+        snprintf(success_message, ECH_SUCCESS_MSG_MAX,
+                 "deleted ECH configs older than %ld seconds from %s", age, args[3]);
+    return cli_msg(appctx, LOG_INFO, success_message);
+}
+
+#endif /* USE_ECH */
+
 #ifdef HAVE_SSL_PROVIDERS
 struct provider_name {
 	const char *name;
@@ -8234,6 +8650,16 @@ static struct cli_kw_list cli_kws = {{ },{
 #endif
 #ifdef HAVE_SSL_PROVIDERS
 	{ { "show", "ssl", "providers", NULL },    "show ssl providers                      : show loaded SSL providers", NULL, cli_io_handler_show_providers },
+#endif
+#ifdef USE_ECH
+    { { "show", "ssl", "ech", NULL},           "show ssl ech [<name>]                   : display a named ECH configuation or all",
+        cli_parse_show_ech, cli_io_handler_ech_details },
+    { { "add", "ssl", "ech", NULL },           "add ssl ech <name> <payload>            : add a new PEM-formatted ECH config and key ",
+        cli_parse_add_ech, NULL, NULL },
+    { { "set", "ssl", "ech", NULL },           "set ssl ech <name> <payload>            : replace all ECH configs with that provided",
+        cli_parse_set_ech, NULL, NULL },
+    { { "del", "ssl", "ech", NULL },           "del ssl ech <name>                      : delete ECH configs",
+        cli_parse_del_ech, NULL, NULL },
 #endif
 	{ { NULL }, NULL, NULL, NULL }
 }};

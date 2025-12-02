@@ -2348,7 +2348,7 @@ yield:
 #endif
 }
 
-/* parsing function for 'show ssl cert [[*][\]<certfile>]' */
+/* parsing function for 'show ssl cert [certfile]' */
 static int cli_parse_show_cert(char **args, char *payload, struct appctx *appctx, void *private)
 {
 	struct show_cert_ctx *ctx = applet_reserve_svcctx(appctx, sizeof(*ctx));
