@@ -1,0 +1,36 @@
+Format: 1.8
+Date: Wed, 06 Aug 2025 15:25:37 +0200
+Source: haproxy
+Binary: haproxy haproxy-dbgsym haproxy-doc vim-haproxy
+Architecture: amd64 all
+Version: 1:3.4.dev1.56.g148db3a69-20260104.065421578774151
+Distribution: testing
+Urgency: medium
+Maintainer: Debian HAProxy Maintainers <team+haproxy@tracker.debian.org>
+Changed-By: Jochen Sprickerhof <jspricke@debian.org>
+Description:
+ haproxy    - fast and reliable load balancing reverse proxy
+ haproxy-doc - fast and reliable load balancing reverse proxy (HTML documentatio
+ vim-haproxy - syntax highlighting for HAProxy configuration files
+Changes:
+ haproxy (1:3.4.dev1.56.g148db3a69-20260104.065421578774151) UNRELEASED; urgency=medium
+ .
+   * Add ECH patch
+Checksums-Sha1:
+ c9d5db17250167d26dbac525618505215901db99 8929068 haproxy-dbgsym_3.4.dev1.56.g148db3a69-20260104.065421578774151_amd64.deb
+ 400475eeed98d1c3abb3470e4cf60ae6494b4f3c 1116964 haproxy-doc_3.4.dev1.56.g148db3a69-20260104.065421578774151_all.deb
+ 7b7b494123d8de693c5d00885d2167c1b385e949 8167 haproxy_3.4.dev1.56.g148db3a69-20260104.065421578774151_amd64.buildinfo
+ 1ac01d39000655a844e8a7dc6cc51ed3daf9fbdf 3056964 haproxy_3.4.dev1.56.g148db3a69-20260104.065421578774151_amd64.deb
+ e834c2f2859d3b01b5c21005f2f3d81ab3d13b03 516316 vim-haproxy_3.4.dev1.56.g148db3a69-20260104.065421578774151_all.deb
+Checksums-Sha256:
+ a72540bf71b3f07b8c16db83a3ee2cd51445803c616263b2390bfc64ecd0de87 8929068 haproxy-dbgsym_3.4.dev1.56.g148db3a69-20260104.065421578774151_amd64.deb
+ 070748c67e45da996ca61ba8d0414c524fe9abcf93e6c4a22dcd5aa0034680a9 1116964 haproxy-doc_3.4.dev1.56.g148db3a69-20260104.065421578774151_all.deb
+ d02c6a20aeebab964286a31aec3ff64da9b803e2fd51bcd3f0b7b13c39c39fc4 8167 haproxy_3.4.dev1.56.g148db3a69-20260104.065421578774151_amd64.buildinfo
+ e5b3be07e51d57051e3c494256a1a874a85fdb66df3189750443611b3d79671e 3056964 haproxy_3.4.dev1.56.g148db3a69-20260104.065421578774151_amd64.deb
+ 2648c56614aaeca72439159181df30c03e68340f9092a7de7878169e56e42029 516316 vim-haproxy_3.4.dev1.56.g148db3a69-20260104.065421578774151_all.deb
+Files:
+ efb6c5847c3a795490adc3b1539c0897 8929068 debug optional haproxy-dbgsym_3.4.dev1.56.g148db3a69-20260104.065421578774151_amd64.deb
+ 8272164a2544991254aed4242a0e4511 1116964 doc optional haproxy-doc_3.4.dev1.56.g148db3a69-20260104.065421578774151_all.deb
+ e19e989982ef3961e381dd9793aa991e 8167 net optional haproxy_3.4.dev1.56.g148db3a69-20260104.065421578774151_amd64.buildinfo
+ 1d3a5c45f06b2d0a163509049211b64c 3056964 net optional haproxy_3.4.dev1.56.g148db3a69-20260104.065421578774151_amd64.deb
+ 4eea31866e199e9f23b718f98a204dbe 516316 net optional vim-haproxy_3.4.dev1.56.g148db3a69-20260104.065421578774151_all.deb
