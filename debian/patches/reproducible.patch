@@ -2,7 +2,7 @@ diff --git a/Makefile b/Makefile
 index 566bdb26a3e7..8603dea25c21 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -975,7 +975,7 @@ src/haproxy.o:	src/haproxy.c $(DEP)
+@@ -1110,7 +1110,7 @@ src/version.o:	src/version.c $(DEP)
  	$(cmd_CC) $(COPTS) \
  	      -DBUILD_TARGET='"$(strip $(TARGET))"' \
  	      -DBUILD_CC='"$(strip $(CC))"' \
