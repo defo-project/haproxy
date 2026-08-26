@@ -1341,6 +1341,7 @@ static int tcp_parse_tcp_req(char **args, int section_type, struct proxy *curpx,
 #ifdef USE_ECH
 	if (strcmp(args[1], "ech-decrypt") == 0) {
         int loaded = 0;
+        char *ech_err = NULL;
 
         if (!*args[2]) {
 			memprintf(err,
@@ -1359,10 +1360,10 @@ static int tcp_parse_tcp_req(char **args, int section_type, struct proxy *curpx,
             }
         }
         /* Add ECH keys to SSL_CTX */
-        if (load_echkeys(curpx->tcp_req.ech_ctx, args[2], &loaded) != 1) {
+        if (load_echkeys(curpx->tcp_req.ech_ctx, args[2], &loaded, &ech_err) != 1) {
             /* Warn that we skipped it */
-			memprintf(err, "loading %s %s %s failed - skipping that one %s '%s'",
-			          args[0], args[1], args[2], proxy_type_str(curpx), curpx->id);
+			memprintf(err, "loading %s %s %s failed - skipping that one %s '%s' %s",
+			          args[0], args[1], args[2], proxy_type_str(curpx), curpx->id, ech_err);
         } else
             ha_notice("%s %s worked - loaded %d keys from %s for %s '%s'\n",
                   args[0], args[1], loaded, args[2], proxy_type_str(curpx), curpx->id);
