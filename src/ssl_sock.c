@@ -8735,6 +8735,7 @@ static int cli_find_ech_specific_ctx(char *name, SSL_CTX **sctx)
     if (!name || !sctx)
         return 0;
     /* check in proxies for backend split-mode cases */
+#ifdef OLDWAY
     pr = proxies_list;
     while (pr && !found) {
         if (!strcmp(pr->id, name) && pr->tcp_req.ech_ctx) {
@@ -8743,6 +8744,13 @@ static int cli_find_ech_specific_ctx(char *name, SSL_CTX **sctx)
         }
         pr = pr->next;
     }
+#else
+    pr = proxy_find_by_name(name, 0, 0);
+    if (pr && pr->tcp_req.ech_ctx) {
+        res = pr->tcp_req.ech_ctx;
+        found = 1;
+    }
+#endif
     /* check fd's for frontend cases */
     while (!found && fd < global.maxsock) {
         fdt = &fdtab[fd++];
@@ -8780,7 +8788,11 @@ static int cli_parse_show_ech(char **args, char *payload, struct appctx *appctx,
     } else {
         ctx->specific_name = NULL;
         ctx->specific_ctx = NULL;
+#ifdef OLDWAY
         ctx->pp = proxies_list;
+#else
+        ctx->pp = main_proxies_first();
+#endif
         ctx->fd = 0;
         ctx->state = SHOW_ECH_PROXY;
     }
@@ -8881,7 +8893,11 @@ static int cli_io_handler_ech_details(struct appctx *appctx)
         while (ctx->pp) {
             struct proxy *pr = ctx->pp;
 
+#ifdef OLDWAY
             ctx->pp = ctx->pp->next;
+#else
+            ctx->pp = main_proxies_next(ctx->pp);
+#endif
             /* split-mode ECH info */
             if (pr->tcp_req.ech_ctx) {
                 chunk_appendf(trash, "***\nbackend (split-mode): %s ", pr->id);
