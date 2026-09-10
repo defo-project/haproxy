@@ -888,14 +888,6 @@ smp_fetch_ssl_hello_sni(const struct arg *args, struct sample *smp, const char *
 	enum client_hello_status status;
 	int hs_len, ext_len;
 	unsigned char *data;
-	struct channel *chn;
-	int bleft;
-
-	status = smp_client_hello_parse(smp, CLIENTHELLO_EXTENSIONS, &data, &hs_len);
-	if (status == CLIENTHELLO_ERR_UNAVAIL)
-		goto not_ssl_hello;
-	else if (status == CLIENTHELLO_ERR_TOO_SHORT)
-		goto too_short;
 
 #ifdef USE_ECH
     /*
@@ -921,16 +913,10 @@ smp_fetch_ssl_hello_sni(const struct arg *args, struct sample *smp, const char *
     }
 #endif
 
-	/* meaningless for HTX buffers */
-	if (IS_HTX_STRM(smp->strm))
+	status = smp_client_hello_parse(smp, CLIENTHELLO_EXTENSIONS, &data, &hs_len);
+	if (status == CLIENTHELLO_ERR_UNAVAIL)
 		goto not_ssl_hello;
-
-	chn = ((smp->opt & SMP_OPT_DIR) == SMP_OPT_DIR_RES) ? &smp->strm->res : &smp->strm->req;
-	bleft = ci_data(chn);
-	data = (unsigned char *)ci_head(chn);
-
-	/* Check for SSL/TLS Handshake */
-	if (!bleft)
+	else if (status == CLIENTHELLO_ERR_TOO_SHORT)
 		goto too_short;
 
 	while (hs_len >= 4) {
