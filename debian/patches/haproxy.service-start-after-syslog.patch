@@ -14,7 +14,7 @@ Last-Update: 2017-12-01
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/admin/systemd/haproxy.service.in b/admin/systemd/haproxy.service.in
-index 74e66e3..243acf2 100644
+index b5dddfb..c7a56d9 100644
 --- a/admin/systemd/haproxy.service.in
 +++ b/admin/systemd/haproxy.service.in
 @@ -1,6 +1,6 @@

@@ -1,8 +1,16 @@
+From: Debian HAProxy Maintainers <team+haproxy@tracker.debian.org>
+Date: Fri, 2 Oct 2026 23:46:57 +0100
+Subject: reproducible
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/Makefile b/Makefile
-index 566bdb26a3e7..8603dea25c21 100644
+index cf8311c..e43ba2c 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1110,7 +1110,7 @@ src/version.o:	src/version.c $(DEP)
+@@ -1190,7 +1190,7 @@ src/version.o:	src/version.c $(DEP)
  	$(cmd_CC) $(COPTS) \
  	      -DBUILD_TARGET='"$(strip $(TARGET))"' \
  	      -DBUILD_CC='"$(strip $(CC))"' \

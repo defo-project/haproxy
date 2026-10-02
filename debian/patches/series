@@ -3,6 +3,3 @@ haproxy.service-add-documentation.patch
 haproxy.service-make-systemd-bind-dev-log-inside-chroot.patch
 reproducible.patch
 cross.patch
-
-# applied during the build process:
-# debianize-dconv.patch

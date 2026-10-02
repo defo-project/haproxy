@@ -1,15 +1,28 @@
---- haproxy-2.9.9.orig/Makefile
-+++ haproxy-2.9.9/Makefile
-@@ -169,6 +169,7 @@
- #### Toolchain options.
- CC = cc
- LD = $(CC)
+From: Debian HAProxy Maintainers <team+haproxy@tracker.debian.org>
+Date: Fri, 2 Oct 2026 23:46:57 +0100
+Subject: cross
+
+---
+ Makefile                                  | 1 +
+ admin/wireshark-dissectors/peers/Makefile | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index e43ba2c..bc6ba9c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -191,6 +191,7 @@ OBJCOPY = $(CROSS_TOOLCHAIN)objcopy
+ OBJDUMP = $(CROSS_TOOLCHAIN)objdump
+ READELF = $(CROSS_TOOLCHAIN)readelf
+ XZ = xz
 +PKG_CONFIG ?= pkg-config
  
  #### Default optimizations
  # Those are integrated early in the list of CFLAGS, and may be overridden by
---- haproxy-2.9.9.orig/admin/wireshark-dissectors/peers/Makefile
-+++ haproxy-2.9.9/admin/wireshark-dissectors/peers/Makefile
+diff --git a/admin/wireshark-dissectors/peers/Makefile b/admin/wireshark-dissectors/peers/Makefile
+index 95149e7..940ffb0 100644
+--- a/admin/wireshark-dissectors/peers/Makefile
++++ b/admin/wireshark-dissectors/peers/Makefile
 @@ -1,5 +1,5 @@
 -CFLAGS  = `pkg-config --cflags wireshark` -g -fPIC $(OPTS)
 -LDFLAGS = `pkg-config --libs wireshark`
