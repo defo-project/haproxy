@@ -1,0 +1,33 @@
+Format: 1.8
+Date: Wed, 06 Aug 2025 15:25:37 +0200
+Source: haproxy
+Binary: haproxy haproxy-doc vim-haproxy
+Architecture: all amd64
+Version: 1:3.5.dev8.210.g3d472998a-20261010.143632745981755
+Distribution: testing
+Urgency: medium
+Maintainer: Debian HAProxy Maintainers <team+haproxy@tracker.debian.org>
+Changed-By: Jochen Sprickerhof <jspricke@debian.org>
+Description:
+ haproxy    - fast and reliable load balancing reverse proxy
+ haproxy-doc - fast and reliable load balancing reverse proxy (HTML documentatio
+ vim-haproxy - syntax highlighting for HAProxy configuration files
+Changes:
+ haproxy (1:3.5.dev8.210.g3d472998a-20261010.143632745981755) UNRELEASED; urgency=medium
+ .
+   * Add ECH patch
+Checksums-Sha1:
+ 0c1a7aa80a08dcd43fb63d1bc2ec38db23dfd030 1199996 haproxy-doc_3.5.dev8.210.g3d472998a-20261010.143632745981755_all.deb
+ 9eb5cfe0e4c6711fb70cf68b60bb551be14223bd 7612 haproxy_3.5.dev8.210.g3d472998a-20261010.143632745981755_amd64.buildinfo
+ 2f67aeae4702023f15db89eb48c1fa872baef1d2 11888092 haproxy_3.5.dev8.210.g3d472998a-20261010.143632745981755_amd64.deb
+ 8611e749023f3e4533e084c9ded71e228bfd0d60 560168 vim-haproxy_3.5.dev8.210.g3d472998a-20261010.143632745981755_all.deb
+Checksums-Sha256:
+ 9965e90af3e4ca88eccd8ac964f3a324fbdc4d223f6df3b735e554425f19b336 1199996 haproxy-doc_3.5.dev8.210.g3d472998a-20261010.143632745981755_all.deb
+ 30d6a62dc2347ab77bb8c78b08ff3b15256abfe6b0b54ca566e6541177393bcf 7612 haproxy_3.5.dev8.210.g3d472998a-20261010.143632745981755_amd64.buildinfo
+ 69b4a41790e092de3a9ae15cb6a94fa12b8dd2e6b13bf71f3578591c8b45776f 11888092 haproxy_3.5.dev8.210.g3d472998a-20261010.143632745981755_amd64.deb
+ 839e452ae78ae282e4850f4f65f8bb3228a1bbd08917f94c859c4e2e19fd07ad 560168 vim-haproxy_3.5.dev8.210.g3d472998a-20261010.143632745981755_all.deb
+Files:
+ 63c9fd7fc2075c511ee32af9542989f2 1199996 doc optional haproxy-doc_3.5.dev8.210.g3d472998a-20261010.143632745981755_all.deb
+ 1e7a8aacfa473d1daedfa1b88fe31bc7 7612 net optional haproxy_3.5.dev8.210.g3d472998a-20261010.143632745981755_amd64.buildinfo
+ 58b1772904b7bfba8b81539d1aada1b6 11888092 net optional haproxy_3.5.dev8.210.g3d472998a-20261010.143632745981755_amd64.deb
+ ef2f1b400d08d979767d3bdd411395c3 560168 net optional vim-haproxy_3.5.dev8.210.g3d472998a-20261010.143632745981755_all.deb
